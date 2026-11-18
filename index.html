@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Thi Quản Trị Nha Khoa - RHM Năm 5 VLU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0fdfa; }
+        .option-btn { transition: all 0.2s ease-in-out; }
+        .option-btn:hover:not(:disabled) { background-color: #ccfbf1; transform: translateX(5px); }
+        .correct { background-color: #a7f3d0 !important; border-color: #10b981 !important; color: #065f46 !important; }
+        .wrong { background-color: #fecaca !important; border-color: #ef4444 !important; color: #991b1b !important; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-xl p-6 md:p-10">
+        <!-- Header -->
+        <div class="border-b-2 border-teal-500 pb-4 mb-6 flex justify-between items-end">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-teal-800">Bộ Đề Ôn Tập: Quản Trị Nha Khoa</h1>
+                <p class="text-teal-600 mt-1">Chương trình RHM Năm 5 - ĐH Văn Lang</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500 font-semibold">Câu hỏi</p>
+                <p class="text-2xl font-bold text-teal-600"><span id="current-question-num">1</span><span class="text-lg text-gray-400">/50</span></p>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div id="quiz-container">
+            <h2 id="question-text" class="text-lg md:text-xl font-semibold text-gray-800 mb-6 leading-relaxed"></h2>
+            
+            <div id="options-container" class="space-y-3 mb-8">
+                <!-- Options will be rendered here -->
+            </div>
+
+            <div id="explanation-box" class="hidden bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg mb-6">
+                <h3 class="font-bold text-blue-800 mb-1">Giải thích chi tiết:</h3>
+                <p id="explanation-text" class="text-blue-900 text-sm md:text-base leading-relaxed"></p>
+            </div>
+
+            <div class="flex justify-end">
+                <button id="next-btn" class="hidden bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg shadow transition duration-200">Câu tiếp theo ➔</button>
+            </div>
+        </div>
+
+        <!-- Result Container -->
+        <div id="result-container" class="hidden text-center py-10">
+            <h2 class="text-3xl font-bold text-teal-800 mb-4">Hoàn thành bài thi!</h2>
+            <p class="text-xl text-gray-600 mb-6">Điểm của bạn: <span id="score" class="font-bold text-teal-600 text-4xl">0</span> / 50</p>
+            <p id="result-message" class="text-lg font-medium mb-8 text-gray-700"></p>
+            <button onclick="location.reload()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-200">Làm lại bài thi</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Theo Harold Koontz và Cyril O'Donnell, định nghĩa quản trị nhấn mạnh vào yếu tố nào?",
+                options: [
+                    "Khai thác tài nguyên thiên nhiên hiệu quả",
+                    "Thiết lập và duy trì một môi trường mà các cá nhân phối hợp hiệu quả",
+                    "Điều khiển nhân viên làm việc chăm chỉ",
+                    "Tối đa hóa lợi nhuận của doanh nghiệp bằng mọi giá"
+                ],
+                correct: 1,
+                explanation: "Quản trị là sự thiết lập và duy trì một môi trường mà trong đó các cá nhân làm việc và phối hợp với nhau một cách hiệu quả."
+            },
+            {
+                question: "Chức năng 'Hoạch định' (Planning) của quản trị tập trung vào việc gì?",
+                options: [
+                    "Thiết lập cơ cấu nhân sự, định hướng nhiệm vụ",
+                    "Theo dõi và đo lường hiệu quả công việc",
+                    "Xác định mục tiêu và những đầu việc cần làm để đạt mục tiêu",
+                    "Chỉ huy, hướng dẫn và giải quyết xung đột"
+                ],
+                correct: 2,
+                explanation: "Chức năng hoạch định đề cập đến việc xác định mục tiêu và những đầu việc cần làm để triển khai, sử dụng hiệu quả nguồn lực hiện tại."
+            },
+            {
+                question: "Sự khác biệt cốt lõi giữa Quản trị và Quản lý là gì?",
+                options: [
+                    "Quản trị quan tâm mục tiêu tổng thể/chiến lược; Quản lý quan tâm mục tiêu cụ thể/thực thi.",
+                    "Quản trị giám sát công việc; Quản lý phân bổ nguồn lực.",
+                    "Quản trị áp dụng cho nhà nước; Quản lý áp dụng cho tư nhân.",
+                    "Không có sự khác biệt."
+                ],
+                correct: 0,
+                explanation: "Quản trị đưa ra các kế hoạch mang tính chiến lược và quan tâm mục tiêu tổng thể. Quản lý điều khiển, giám sát các nhiệm vụ cụ thể mang tính thực thi."
+            },
+            {
+                question: "Theo bộ công cụ CEO về quản trị nhân sự, 5 lớp để thấu hiểu một nhân sự bao gồm những gì?",
+                options: [
+                    "Kiến thức, Kỹ năng, Thái độ, Phối hợp, Kỷ luật",
+                    "Mục đích, Kết quả, Trách nhiệm, Quyền hạn, Phối hợp",
+                    "Kết quả, Năng lực, Hành vi, Động lực, Điều kiện",
+                    "Lương, Thưởng, Chấm công, Năng suất, Giá trị"
+                ],
+                correct: 2,
+                explanation: "5 lớp để hiểu một nhân sự: Kết quả (đã tạo ra gì), Năng lực (có thể làm gì), Hành vi (làm việc thế nào), Động lực (vì sao làm), Điều kiện (cần gì để phát huy)."
+            },
+            {
+                question: "Trong quy trình phỏng vấn hành vi STAR, 'Bằng chứng' thực sự về năng lực của ứng viên nằm ở đâu?",
+                options: [
+                    "Lời cam kết 'Tôi có trách nhiệm'",
+                    "Bằng cấp và chứng chỉ",
+                    "Hành vi thực tế ứng viên đã làm trong quá khứ",
+                    "Cách ứng viên trả lời câu hỏi lý thuyết"
+                ],
+                correct: 2,
+                explanation: "Câu nói 'Tôi có trách nhiệm' chưa phải bằng chứng; hành vi thực tế họ đã làm (Action & Result) mới là bằng chứng xác thực năng lực."
+            },
+            {
+                question: "Theo quan điểm hệ thống, hệ thống nha khoa trưởng thành khi nào?",
+                options: [
+                    "Khi doanh thu đạt mức cao nhất",
+                    "Khi mọi năng lực đều phụ thuộc vào một bác sĩ giỏi",
+                    "Khi năng lực không còn nằm trong đầu của một vài người mà được chuẩn hóa",
+                    "Khi không còn khách hàng phàn nàn"
+                ],
+                correct: 2,
+                explanation: "Hệ thống trưởng thành (tính kế thừa) khi kiến thức được chuẩn hóa, kinh nghiệm được chia sẻ, và năng lực không còn nằm trong đầu của một vài người."
+            },
+            {
+                question: "Tỷ trọng chi phí nhân sự mục tiêu (Lao động) an toàn cho một phòng khám tiêu chuẩn 8 ghế là bao nhiêu?",
+                options: [
+                    "10 - 15%",
+                    "35 - 38%",
+                    "50 - 60%",
+                    "Dưới 10%"
+                ],
+                correct: 1,
+                explanation: "Ngưỡng tối ưu chi phí nhân lực là 35-38%. Nếu vượt quá 40% trong 3 tháng liên tiếp cần cảnh báo và điều chỉnh hiệu suất."
+            },
+            {
+                question: "Công thức tính Điểm hòa vốn (Break-even Point) là gì?",
+                options: [
+                    "Doanh thu trừ Chi phí biến đổi",
+                    "Chi phí cố định chia Tỷ lệ phần đóng góp",
+                    "Tổng doanh thu trừ Tổng chi phí",
+                    "Chi phí cố định cộng Chi phí biến đổi"
+                ],
+                correct: 1,
+                explanation: "Điểm hòa vốn = Chi phí cố định / Tỷ lệ phần đóng góp. Giúp xác định doanh thu tối thiểu để phòng khám không bị lỗ."
+            },
+            {
+                question: "Chi phí mua sắm ghế nha khoa, máy CBCT ban đầu thuộc loại chi phí nào?",
+                options: [
+                    "OPEX (Chi phí vận hành)",
+                    "Biến phí",
+                    "CAPEX (Vốn đầu tư)",
+                    "Chi phí chung"
+                ],
+                correct: 2,
+                explanation: "Vốn đầu tư (CAPEX) là chi phí cố định ban đầu cho mặt bằng, xây dựng, ghế nha và thiết bị lớn. Không được dùng vốn lưu động (OPEX) để đầu tư CAPEX."
+            },
+            {
+                question: "Ba báo cáo tài chính cốt lõi quản trị một phòng khám là gì?",
+                options: [
+                    "Báo cáo kết quả HĐKD, Bảng cân đối kế toán, Báo cáo lưu chuyển tiền tệ",
+                    "Báo cáo nhân sự, Báo cáo vật tư, Báo cáo thuế",
+                    "Báo cáo doanh thu, Báo cáo chi phí, Báo cáo lợi nhuận",
+                    "Báo cáo marketing, Báo cáo vận hành, Báo cáo lâm sàng"
+                ],
+                correct: 0,
+                explanation: "3 góc nhìn tài chính: Báo cáo KQ HĐKD (Doanh thu/Chi phí), Tình hình tài chính/Bảng cân đối kế toán (Tài sản/Nguồn vốn), Lưu chuyển tiền tệ (Dòng tiền vào/ra)."
+            },
+            {
+                question: "Báo cáo cho thấy lợi nhuận rất cao nhưng phòng khám vẫn cạn kiệt tiền mặt. Giám đốc cần kiểm tra ngay các yếu tố nào?",
+                options: [
+                    "Lương nhân viên",
+                    "Tiền điện nước, internet",
+                    "Phải thu, Tồn kho, Đầu tư, Nợ trả ngân hàng",
+                    "Chi phí chạy quảng cáo Facebook"
+                ],
+                correct: 2,
+                explanation: "Tiền thực tế có thể bị kẹt ở công nợ (phải thu), đọng ở vật tư (tồn kho), đem đi mua sắm thiết bị (đầu tư) hoặc trả nợ gốc ngân hàng, khiến lợi nhuận cao nhưng túi không có tiền."
+            },
+            {
+                question: "Bản chất của khái niệm 'Biến chứng' (Complication) là gì?",
+                options: [
+                    "Hành động thực hiện không đúng dự kiến ban đầu",
+                    "Lỗi hệ thống hoặc lỗi do thiết bị hỏng",
+                    "Sự kiện bất lợi có thể xảy ra dù bác sĩ đã điều trị đúng chỉ định và quy trình",
+                    "Tai biến do bác sĩ thiếu kinh nghiệm"
+                ],
+                correct: 2,
+                explanation: "Biến chứng đã biết trước có thể xảy ra dù chăm sóc đúng. Quản trị rủi ro xem xét việc đã dự phòng, giải thích, theo dõi và xử trí đầy đủ chưa."
+            },
+            {
+                question: "Quy trình Time-out 60 giây trước thủ thuật cần xác nhận những nội dung nào?",
+                options: [
+                    "Đúng người bệnh, đúng thủ thuật, đúng răng, đúng hồ sơ/phim, đủ an toàn, sẵn sàng ứng phó",
+                    "Kiểm tra hóa đơn thanh toán, bảng giá dịch vụ",
+                    "Kiểm tra thẻ BHYT, CCCD của bệnh nhân",
+                    "Xác nhận số lượng vật tư tiêu hao sẽ dùng"
+                ],
+                correct: 0,
+                explanation: "Time-out là một lần dừng có chủ đích để chặn sai người bệnh, sai răng, sai hồ sơ, sai thủ thuật và kiểm tra sự sẵn sàng cấp cứu."
+            },
+            {
+                question: "Bẫy tư duy 'Neo chẩn đoán' (Anchoring) trong y khoa là gì?",
+                options: [
+                    "Dừng tìm chẩn đoán phân biệt ngay khi có lời giải thích hợp lý",
+                    "Ưu tiên dữ kiện ủng hộ giả thuyết đang tin, bỏ qua dấu hiệu lạ",
+                    "Bám vào nhận định đầu tiên và khó điều chỉnh khi có dữ kiện mới",
+                    "Sợ đưa ra chẩn đoán vì sợ sai"
+                ],
+                correct: 2,
+                explanation: "Neo chẩn đoán là việc bám chặt vào nhận định ban đầu, dẫn đến việc không chịu thay đổi chẩn đoán dù đã có các dữ kiện lâm sàng mới mâu thuẫn."
+            },
+            {
+                question: "Khi xảy ra sự cố y khoa nghiêm trọng, 5 ưu tiên hàng đầu trong giờ đầu tiên KHÔNG BAO GỒM việc nào?",
+                options: [
+                    "An toàn người bệnh (cấp cứu)",
+                    "Bảo toàn bằng chứng",
+                    "Tranh luận tìm người có lỗi và hứa bồi thường ngay lập tức",
+                    "Cô lập nguy cơ và thông báo đúng tuyến"
+                ],
+                correct: 2,
+                explanation: "Trong giờ đầu tiên, tuyệt đối KHÔNG tranh luận, đổ lỗi trước mặt người bệnh, không hứa bồi thường, không sửa/xóa hồ sơ và không đăng tải vụ việc lên mạng."
+            },
+            {
+                question: "Nguyên tắc thiết kế hệ thống vô khuẩn chuẩn trong phòng khám là gì?",
+                options: [
+                    "Di chuyển tự do giữa các khu vực",
+                    "Quy trình xử lý dụng cụ một chiều: Bẩn -> Sạch -> Tiệt khuẩn",
+                    "Khu tiệt khuẩn đặt chung với sảnh chờ cho tiết kiệm không gian",
+                    "Tần suất trao đổi khí 2 lần/giờ"
+                ],
+                correct: 1,
+                explanation: "Kiểm soát nhiễm khuẩn yêu cầu tách dòng sạch - bẩn và xử lý dụng cụ theo luồng 1 chiều. Tần suất trao đổi khí chuẩn phải là 6-12 lần/giờ."
+            },
+            {
+                question: "Khi phát hiện một sự cố suýt xảy ra (Near miss), văn hóa công bằng (Just Culture) khuyến khích hành động gì?",
+                options: [
+                    "Phạt nặng nhân viên để răn đe",
+                    "Che giấu để không ảnh hưởng uy tín",
+                    "Báo cáo để sửa lỗi hệ thống/hàng rào trước khi người bệnh bị tổn hại",
+                    "Đuổi việc người làm sai"
+                ],
+                correct: 2,
+                explanation: "Báo cáo near miss là cơ hội sửa hàng rào. Thay vì hỏi 'Ai sai?', hãy hỏi 'Điều gì đã khiến việc an toàn trở nên khó thực hiện?'."
+            },
+            {
+                question: "Chỉ số NPS (Net Promoter Score) được tính bằng công thức nào?",
+                options: [
+                    "Tổng điểm chia cho số người khảo sát",
+                    "% Nhóm Promoters trừ đi % Nhóm Detractors",
+                    "% Nhóm Passives cộng % Promoters",
+                    "% Nhóm Detractors trừ đi % Nhóm Promoters"
+                ],
+                correct: 1,
+                explanation: "NPS = % Promoters (9-10 điểm) - % Detractors (0-6 điểm). Nhóm Passives (7-8 điểm) không được cộng vào NPS."
+            },
+            {
+                question: "Chỉ số CES (Customer Effort Score) đo lường điều gì?",
+                options: [
+                    "Sự hài lòng sau khi khám",
+                    "Sự trung thành của khách hàng",
+                    "Mức độ dễ dàng hay khó khăn khi khách hàng tương tác/giải quyết vấn đề với phòng khám",
+                    "Doanh thu khách hàng mang lại"
+                ],
+                correct: 2,
+                explanation: "CES đo lường mức độ nỗ lực của khách hàng (VD: Việc đặt lịch hẹn hay giải quyết khiếu nại của bạn có dễ dàng không?)."
+            },
+            {
+                question: "Trong biểu đồ lòng trung thành, nhóm khách hàng ở đỉnh phễu (giữ chân cao nhất) được gọi là gì?",
+                options: [
+                    "Người mua hàng",
+                    "Khách hàng tiềm năng",
+                    "Người ủng hộ",
+                    "Đối tác"
+                ],
+                correct: 3,
+                explanation: "Biểu đồ lòng trung thành đi từ: Khách hàng tiềm năng -> Người mua hàng -> Người ủng hộ -> Đối tác (Partner) - mức độ trung thành và gắn kết cao nhất."
+            },
+            {
+                question: "Theo Nghị định 96/2023/NĐ-CP, diện tích tối thiểu của một ghế răng (không tính phòng cấy ghép) là bao nhiêu?",
+                options: [
+                    "5 m2",
+                    "10 m2",
+                    "15 m2",
+                    "20 m2"
+                ],
+                correct: 0,
+                explanation: "Bố trí tối thiểu 01 ghế răng, diện tích cho mỗi ghế răng tối thiểu là 5 m2. Riêng phòng thực hiện kỹ thuật cấy ghép răng (Implant) tối thiểu 10 m2."
+            },
+            {
+                question: "Người chịu trách nhiệm chuyên môn kỹ thuật của phòng khám RHM phải đáp ứng điều kiện hành nghề gì?",
+                options: [
+                    "Hành nghề bán thời gian, 18 tháng kinh nghiệm",
+                    "Hành nghề toàn thời gian, thời gian hành nghề tối thiểu 36 tháng",
+                    "Có chứng chỉ phụ tá nha khoa 6 tháng",
+                    "Là bác sĩ vừa tốt nghiệp, đã hoàn thành 12 tháng thực hành"
+                ],
+                correct: 1,
+                explanation: "Người chịu trách nhiệm chuyên môn kỹ thuật phải là Bác sĩ chuyên khoa RHM, làm việc TOÀN THỜI GIAN và có thời gian hành nghề ở phạm vi đó tối thiểu 36 tháng."
+            },
+            {
+                question: "Theo quy định pháp luật, thời gian thực hành bắt buộc đối với Bác sĩ Răng Hàm Mặt để được cấp GPHN là?",
+                options: [
+                    "9 tháng",
+                    "12 tháng",
+                    "18 tháng",
+                    "36 tháng"
+                ],
+                correct: 1,
+                explanation: "Thời gian thực hành đối với chức danh bác sĩ là 12 tháng, bao gồm 09 tháng chuyên môn và 03 tháng hồi sức cấp cứu."
+            },
+            {
+                question: "Người hành nghề RHM phải hoàn thành bao nhiêu giờ cập nhật kiến thức y khoa liên tục (CME) để gia hạn GPHN?",
+                options: [
+                    "48 giờ tín chỉ / 2 năm",
+                    "120 giờ tín chỉ / 5 năm",
+                    "200 giờ tín chỉ / 5 năm",
+                    "Không bắt buộc"
+                ],
+                correct: 1,
+                explanation: "Người hành nghề có nghĩa vụ tham gia cập nhật kiến thức y khoa liên tục tối thiểu 120 giờ tín chỉ trong 05 năm liên tục để gia hạn giấy phép hành nghề."
+            },
+            {
+                question: "Một bác sĩ RHM đang là người hành nghề toàn thời gian tại Bệnh viện A. Bác sĩ này có được đăng ký hành nghề tại Phòng khám B không?",
+                options: [
+                    "Không, chỉ được đăng ký ở 1 cơ sở duy nhất.",
+                    "Được, nhưng phải đăng ký vào khung giờ không trùng với thời gian hoạt động hành chính tại Bệnh viện A.",
+                    "Được, có thể đăng ký trùng giờ nếu ủy quyền cho người khác khám.",
+                    "Được, nhưng chỉ được đăng ký chức danh phụ tá."
+                ],
+                correct: 1,
+                explanation: "Người hành nghề được đăng ký tại nhiều cơ sở KBCB nhưng KHÔNG được trùng thời gian khám bệnh, chữa bệnh giữa các cơ sở."
+            },
+            {
+                question: "Luật KCB 2023 cho phép người hành nghề TỪ CHỐI khám bệnh, chữa bệnh trong trường hợp nào?",
+                options: [
+                    "Bệnh nhân nghèo không có tiền trả.",
+                    "Gần đến giờ nghỉ trưa.",
+                    "Tiên lượng tình trạng bệnh vượt quá khả năng hoặc không thuộc phạm vi hành nghề.",
+                    "Bệnh nhân là người nước ngoài."
+                ],
+                correct: 2,
+                explanation: "Được từ chối khi bệnh vượt quá khả năng chuyên môn (phải giới thiệu chuyển tuyến & sơ cứu), bệnh nhân đe dọa bạo lực, hoặc yêu cầu phương pháp trái chuyên môn."
+            },
+            {
+                question: "Theo Điều 34 Luật KBCB, người hành nghề có thể bị ĐÌNH CHỈ giấy phép hành nghề trong thời gian bao lâu?",
+                options: [
+                    "15 ngày đến 30 ngày",
+                    "Từ 01 tháng đến 24 tháng",
+                    "Từ 36 tháng đến 48 tháng",
+                    "Đình chỉ vĩnh viễn không thời hạn"
+                ],
+                correct: 1,
+                explanation: "Tùy theo tính chất, mức độ sai sót chuyên môn hoặc vi phạm đạo đức, người hành nghề bị đình chỉ hành nghề trong thời hạn từ 01 tháng đến 24 tháng."
+            },
+            {
+                question: "Đâu là hành vi BỊ NGHIÊM CẤM trong hoạt động khám bệnh, chữa bệnh?",
+                options: [
+                    "Từ chối điều trị khi bệnh nhân có hành vi đe dọa bạo lực.",
+                    "Áp dụng kỹ thuật mới đã được Bộ Y tế phê duyệt.",
+                    "Thuê, mượn, cho thuê, cho mượn giấy phép hành nghề hoặc giấy phép hoạt động.",
+                    "Lập hồ sơ bệnh án điện tử thay cho bệnh án giấy."
+                ],
+                correct: 2,
+                explanation: "Việc thuê, mượn chứng chỉ hành nghề/giấy phép hoạt động là hành vi vi phạm pháp luật và bị nghiêm cấm hoàn toàn theo Điều 7 Luật KCB 2023."
+            },
+            {
+                question: "Cấp độ thứ bậc cao nhất (hiệu quả nhất) trong hệ thống kiểm soát rủi ro là gì?",
+                options: [
+                    "Bảo hộ cá nhân (PPE)",
+                    "Quy trình hành chính (Checklist)",
+                    "Thiết kế hệ thống",
+                    "Loại bỏ (Xóa nguồn nguy cơ)"
+                ],
+                correct: 3,
+                explanation: "Thứ bậc kiểm soát rủi ro từ cao xuống thấp: 1. Loại bỏ -> 2. Thay thế -> 3. Thiết kế hệ thống -> 4. Quy trình hành chính -> 5. Bảo hộ cá nhân."
+            },
+            {
+                question: "Công cụ Phân tích nguyên nhân gốc rễ (RCA - 5 Whys & Biểu đồ Xương cá) không bao gồm yếu tố nào sau đây trong các nhánh phân tích?",
+                options: [
+                    "Môi trường làm việc",
+                    "Con người & Năng lực",
+                    "Số lượng đối thủ cạnh tranh",
+                    "Thiết bị & Công nghệ"
+                ],
+                correct: 2,
+                explanation: "Biểu đồ xương cá (Ishikawa) phân tích 6 nhánh: Người bệnh, Con người & năng lực, Quy trình, Thiết bị/công nghệ, Môi trường làm việc, Tổ chức/quản trị."
+            },
+            {
+                question: "Đồng thuận điều trị (Informed Consent) đúng nghĩa là gì?",
+                options: [
+                    "Tờ giấy bệnh nhân ký để miễn trừ trách nhiệm cho bác sĩ.",
+                    "Một quá trình đối thoại cung cấp đủ thông tin về chẩn đoán, lợi ích, nguy cơ và phương án thay thế để bệnh nhân tự nguyện ra quyết định.",
+                    "Báo giá chi phí trước khi làm răng.",
+                    "Cam kết kết quả 100% thành công."
+                ],
+                correct: 1,
+                explanation: "Đồng thuận là một quá trình trao đổi 5 bước. Chữ ký xác nhận quá trình đã trao đổi chứ không thể thay thế quá trình tư vấn minh bạch."
+            },
+            {
+                question: "Hồ sơ bệnh án an toàn phải đáp ứng 4 tiêu chí nào?",
+                options: [
+                    "Dài dòng, đẹp mắt, có ảnh màu, nhiều trang",
+                    "Đầy đủ, Đúng thời điểm, Khách quan/Toàn vẹn, Bảo mật",
+                    "Viết tay, đóng mộc đỏ, lưu kho, không sửa",
+                    "Ghi chép sau 1 tháng, sửa chữa thoải mái, dùng tiếng Anh, chia sẻ công khai"
+                ],
+                correct: 1,
+                explanation: "Hồ sơ cần Ghi đúng thời điểm, Khách quan (có thể truy vết), Toàn vẹn (không tẩy xóa/làm đẹp sau sự cố) và Bảo mật (phân quyền)."
+            },
+            {
+                question: "Mô hình 7Ps trong Marketing dịch vụ mở rộng thêm 3 yếu tố nào so với 4Ps?",
+                options: [
+                    "People (Con người), Process (Quy trình), Physical evidence (Cơ sở vật chất)",
+                    "Packaging, Positioning, Public Relations",
+                    "Payment, Patient, Passion",
+                    "Profit, Plan, Performance"
+                ],
+                correct: 0,
+                explanation: "4Ps là Product, Price, Place, Promotion. Marketing dịch vụ thêm 3Ps là People, Process, Physical evidence."
+            },
+            {
+                question: "Chiến lược Marketing nào được đánh giá là mạnh mẽ và bền vững nhất trong ngành nha khoa?",
+                options: [
+                    "Chạy quảng cáo Facebook Ads ngân sách lớn",
+                    "Phát tờ rơi trước cổng trường học",
+                    "Word of Mouth (Truyền miệng từ trải nghiệm hài lòng của bệnh nhân)",
+                    "Giảm giá 80% mọi dịch vụ"
+                ],
+                correct: 2,
+                explanation: "'Hữu xạ tự nhiên hương' - Truyền miệng là chiến lược mạnh mẽ nhất khi bệnh nhân thực sự hài lòng và giới thiệu phòng khám cho người thân."
+            },
+            {
+                question: "Trong Marketing Truyền thông, 4 cấp độ nhận thức của khách hàng đối với thương hiệu là gì?",
+                options: [
+                    "Nhìn -> Chạm -> Dùng -> Mua",
+                    "Biết -> Hiểu -> Tin -> Yêu (Trung thành)",
+                    "Xem quảng cáo -> Click -> Gọi điện -> Đến khám",
+                    "Ghét -> Tò mò -> Thử -> Chấp nhận"
+                ],
+                correct: 1,
+                explanation: "Các cấp bậc truyền thông marketing đi từ: Cấp biết (nhận thức ban đầu) -> Cấp hiểu -> Cấp tin (đánh giá tích cực) -> Cấp yêu (trung thành)."
+            },
+            {
+                question: "Theo mô hình chăm sóc sức khỏe 'Lấy người bệnh làm trung tâm', đặc điểm nào là sai?",
+                options: [
+                    "Đặt nhu cầu, giá trị và ước muốn của người bệnh lên hàng đầu.",
+                    "Khuyến khích người bệnh tham gia vào quyết định điều trị.",
+                    "Bác sĩ là người ra lệnh tuyệt đối, bệnh nhân chỉ việc tuân thủ.",
+                    "Đảm bảo sự liên tục trong chăm sóc sức khỏe."
+                ],
+                correct: 2,
+                explanation: "Mô hình này đề cao 'Tương tác và tham gia', thúc đẩy sự hợp tác tích cực giữa bệnh nhân và nhà cung cấp dịch vụ, thay vì cơ chế áp đặt một chiều."
+            },
+            {
+                question: "Công cụ 'Marketing Automation' KHÔNG bao gồm tính năng nào sau đây?",
+                options: [
+                    "Phân loại & quản lý dữ liệu khách hàng",
+                    "Gửi Email/SMS tự động theo kịch bản",
+                    "Tự động chẩn đoán bệnh thay bác sĩ",
+                    "Quản lý chiến dịch đa kênh"
+                ],
+                correct: 2,
+                explanation: "Marketing Automation hỗ trợ tự động hóa các khâu chăm sóc khách hàng (nhắc lịch, gửi email, phân loại lead), không thể thay thế phán đoán và chẩn đoán lâm sàng của bác sĩ."
+            },
+            {
+                question: "Khi tiếp nhận khiếu nại từ một người tự xưng là 'người nhà bệnh nhân' trên điện thoại, nguyên tắc xử lý là gì?",
+                options: [
+                    "Cung cấp toàn bộ hồ sơ bệnh án ngay lập tức để họ không giận",
+                    "Tranh luận chuyên môn để bảo vệ bác sĩ",
+                    "Chưa cung cấp thông tin khi chưa xác minh được danh tính và quyền đại diện hợp pháp",
+                    "Chặn số điện thoại"
+                ],
+                correct: 2,
+                explanation: "Nguyên tắc bảo mật thông tin người bệnh yêu cầu không được chia sẻ thông tin khi chưa xác minh danh tính và thẩm quyền của người gọi."
+            },
+            {
+                question: "Một ca điều trị đi qua 3 góc nhìn của báo cáo tài chính. Báo cáo nào đo lường mức độ đọng vốn ở vật tư và công nợ?",
+                options: [
+                    "Báo cáo kết quả hoạt động kinh doanh (P&L)",
+                    "Báo cáo tình hình tài chính / Bảng cân đối kế toán",
+                    "Báo cáo lưu chuyển tiền tệ",
+                    "Báo cáo Marketing"
+                ],
+                correct: 1,
+                explanation: "Báo cáo Tình hình tài chính (Balance Sheet) quản lý các tài sản (Tiền, Phải thu, Tồn kho, Tài sản cố định) và Nguồn vốn (Nợ, Vốn chủ)."
+            },
+            {
+                question: "Mục đích của việc trích lập 'Khấu hao thiết bị' trong kế hoạch tài chính là gì?",
+                options: [
+                    "Để trốn thuế",
+                    "Phân bổ chi phí đầu tư ban đầu vào chi phí hoạt động theo thời gian để tái đầu tư, nâng cấp máy móc",
+                    "Để tính lương cho bác sĩ",
+                    "Để giảm giá thành dịch vụ"
+                ],
+                correct: 1,
+                explanation: "Khấu hao là cách phân bổ giá trị tài sản lớn (như máy CT, ghế nha) qua từng tháng/năm, tạo ra một quỹ dự phòng để thay thế thiết bị sau 3-5 năm."
+            },
+            {
+                question: "Yếu tố nào sau đây là Chi phí biến đổi (Variable Cost)?",
+                options: [
+                    "Tiền thuê mặt bằng",
+                    "Tiền mua phần mềm quản lý hàng tháng",
+                    "Tiền thanh toán cho Labo răng giả",
+                    "Tiền lương cơ bản của lễ tân"
+                ],
+                correct: 2,
+                explanation: "Chi phí labo, vật tư tiêu hao (implant, mắc cài) và hoa hồng bác sĩ tính theo ca là các biến phí vì nó tăng giảm trực tiếp theo số ca bệnh."
+            },
+            {
+                question: "Theo Checklist 20 điểm đánh giá địa điểm, tiêu chí nào thuộc nhóm 'Thị trường & Cạnh tranh'?",
+                options: [
+                    "Đường 2 chiều, không dải phân cách cứng",
+                    "Mật độ phòng khám nha khoa vừa phải, vị trí dễ nhận diện thương hiệu",
+                    "Hệ thống đấu nối nước thải y tế thuận lợi",
+                    "Tính linh hoạt trong điều khoản gia hạn hợp đồng"
+                ],
+                correct: 1,
+                explanation: "Nhóm Thị trường & Cạnh tranh xem xét mức sống, mật độ phòng khám đối thủ, tính nhận diện thương hiệu và tiện ích xung quanh."
+            },
+            {
+                question: "Hội đồng Y khoa Quốc gia tổ chức kiểm tra đánh giá năng lực hành nghề đối với chức danh Bác sĩ bắt đầu từ ngày nào?",
+                options: [
+                    "01/01/2024",
+                    "01/01/2025",
+                    "01/01/2026",
+                    "01/01/2027"
+                ],
+                correct: 3,
+                explanation: "Theo Điều 120 Nghị định 96/2023/NĐ-CP, việc kiểm tra năng lực do Hội đồng Y khoa Quốc gia thực hiện áp dụng từ 01/01/2027 đối với bác sĩ."
+            },
+            {
+                question: "Trường hợp nào sau đây Bác sĩ RHM KHÔNG bị thu hồi Giấy phép hành nghề?",
+                options: [
+                    "Giả mạo tài liệu trong hồ sơ đề nghị cấp phép.",
+                    "Không hành nghề trong thời gian 24 tháng liên tục (không tính thời gian đi học chuyên khoa).",
+                    "Nữ bác sĩ nghỉ thai sản 6 tháng.",
+                    "Hai lần bị đình chỉ hành nghề vì sai sót chuyên môn kỹ thuật."
+                ],
+                correct: 2,
+                explanation: "Nghỉ thai sản 6 tháng không vi phạm quy định 'không hành nghề 24 tháng liên tục', do đó không bị thu hồi GPHN."
+            },
+            {
+                question: "Một cơ sở khám bệnh, chữa bệnh bắt buộc phải có Hộp cấp cứu phản vệ. Hộp này cần bao nhiêu lọ Nhũ dịch Lipid 20% 100ml (nơi có dùng thuốc gây tê)?",
+                options: [
+                    "1 lọ",
+                    "2 lọ",
+                    "3 lọ",
+                    "Không cần thiết"
+                ],
+                correct: 1,
+                explanation: "Trong danh mục trang thiết bị cấp cứu phản vệ tối thiểu, nơi có sử dụng thuốc gây tê phải dự trữ 02 lọ nhũ dịch Lipid 20% 100ml để giải độc thuốc tê."
+            },
+            {
+                question: "Chức năng 'Lãnh đạo' (Leading) trong quản trị tập trung vào việc gì?",
+                options: [
+                    "Thiết lập KPI cho nhân viên",
+                    "Chỉ huy, hướng dẫn, truyền động lực và giải quyết xung đột để tạo sự gắn kết",
+                    "Thanh lý tài sản hư hỏng",
+                    "Kê khai thuế cuối năm"
+                ],
+                correct: 1,
+                explanation: "Chức năng lãnh đạo hướng tới yếu tố con người: hướng dẫn, thúc đẩy, thấu hiểu tâm lý và giải quyết xung đột."
+            },
+            {
+                question: "Tại sao nói 'Doanh thu tăng nhưng tiền vẫn có thể thiếu'?",
+                options: [
+                    "Vì kế toán tính nhầm",
+                    "Vì doanh thu tăng nhưng khách hàng nợ tiền (phải thu tăng), hoặc phòng khám dùng tiền nhập quá nhiều hàng (tồn kho tăng)",
+                    "Vì thuế thu nhập doanh nghiệp quá cao",
+                    "Vì tiền bị lạm phát"
+                ],
+                correct: 1,
+                explanation: "Có doanh thu không đồng nghĩa với có dòng tiền. Tiền mặt bị hút vào công nợ (phải thu) và hàng tồn kho sẽ dẫn đến đứt gãy dòng tiền vận hành."
+            },
+            {
+                question: "Theo Bộ công cụ CEO, để hiểu động lực nội tại của nhân sự, nhà quản lý cần đáp ứng 5 yếu tố nào?",
+                options: [
+                    "Lương, Thưởng, Trợ cấp, Phúc lợi, Bảo hiểm",
+                    "Ý nghĩa, Năng lực, Tự chủ, Công bằng, Gắn kết",
+                    "Kỷ luật, Khen ngợi, Đe dọa, Sa thải, Tăng ca",
+                    "Máy móc, Đồng phục, Bảng tên, Chức danh, Phòng làm việc"
+                ],
+                correct: 1,
+                explanation: "5 yếu tố tạo động lực nội tại: Ý nghĩa (giá trị tạo ra), Năng lực (cơ hội học hỏi), Tự chủ (quyền quyết định), Công bằng (ghi nhận xứng đáng), Gắn kết (thuộc về đội ngũ)."
+            },
+            {
+                question: "Điều nào sau đây KHÔNG PHẢI là nguyên tắc khi 'Ghi hồ sơ bệnh án' để bảo vệ an toàn y khoa?",
+                options: [
+                    "Ghi đúng thời điểm",
+                    "Ghi khách quan, có thể truy vết",
+                    "Làm đẹp hồ sơ bằng cách xóa bỏ các sai sót đã ghi trước đó sau khi có khiếu nại",
+                    "Bảo mật và phân quyền truy cập"
+                ],
+                correct: 2,
+                explanation: "Tuyệt đối không được làm đẹp, tẩy xóa hay sửa chữa hồ sơ bệnh án sau khi sự cố xảy ra. Mọi bổ sung phải thể hiện rõ thời gian và người bổ sung."
+            },
+            {
+                question: "Khi xảy ra sự cố suýt xảy ra (Near miss) - ví dụ phụ tá mang nhầm phim của người khác nhưng phát hiện kịp trước khi nhổ răng. Hành động đúng của phòng khám là gì?",
+                options: [
+                    "Phạt phụ tá 1 tháng lương",
+                    "Cảm ơn phụ tá và quên chuyện đó đi",
+                    "Sử dụng công cụ 5 Whys để tìm lỗ hổng quy trình và thêm chốt chặn 'đối chiếu 2 định danh'",
+                    "Đuổi việc lễ tân vì đưa nhầm phim"
+                ],
+                correct: 2,
+                explanation: "Phân tích nguyên nhân gốc rễ (RCA) bằng 5 Whys giúp tìm ra lỗi hệ thống (thiếu chốt chặn xác nhận) thay vì quy chụp lỗi cá nhân. Từ đó cải tiến quy trình (VD: Time-out)."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+
+        const questionText = document.getElementById("question-text");
+        const optionsContainer = document.getElementById("options-container");
+        const explanationBox = document.getElementById("explanation-box");
+        const explanationText = document.getElementById("explanation-text");
+        const nextBtn = document.getElementById("next-btn");
+        const currentQuestionNum = document.getElementById("current-question-num");
+        const quizContainer = document.getElementById("quiz-container");
+        const resultContainer = document.getElementById("result-container");
+        const scoreSpan = document.getElementById("score");
+        const resultMessage = document.getElementById("result-message");
+
+        function loadQuestion() {
+            answered = false;
+            explanationBox.classList.add("hidden");
+            nextBtn.classList.add("hidden");
+            optionsContainer.innerHTML = "";
+            
+            const q = questions[currentQuestion];
+            currentQuestionNum.innerText = currentQuestion + 1;
+            questionText.innerText = q.question;
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn w-full text-left bg-gray-50 border-2 border-gray-200 hover:border-teal-400 text-gray-700 font-medium py-3 px-5 rounded-xl shadow-sm focus:outline-none";
+                btn.innerText = String.fromCharCode(65 + index) + ". " + opt;
+                btn.onclick = () => checkAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(selectedIndex, selectedBtn) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestion];
+            const allBtns = optionsContainer.children;
+
+            if (selectedIndex === q.correct) {
+                selectedBtn.classList.add("correct");
+                score++;
+            } else {
+                selectedBtn.classList.add("wrong");
+                allBtns[q.correct].classList.add("correct");
+            }
+
+            // Disable all buttons
+            for (let btn of allBtns) {
+                btn.disabled = true;
+                btn.classList.add("cursor-not-allowed", "opacity-75");
+            }
+
+            explanationText.innerText = q.explanation;
+            explanationBox.classList.remove("hidden");
+            nextBtn.classList.remove("hidden");
+            
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.innerText = "Xem kết quả ➔";
+            }
+        }
+
+        nextBtn.onclick = () => {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        };
+
+        function showResult() {
+            quizContainer.classList.add("hidden");
+            resultContainer.classList.remove("hidden");
+            scoreSpan.innerText = score;
+            
+            let message = "";
+            if (score >= 40) message = "Xuất sắc! Bạn đã nắm rất vững kiến thức Quản trị nha khoa. Tự tin bước vào phòng thi nhé! 🎉";
+            else if (score >= 25) message = "Khá tốt! Bạn đã có nền tảng cơ bản. Cần ôn lại chút xíu về Tài chính và Pháp lý nhé! 👍";
+            else message = "Đừng nản lòng! Khối lượng kiến thức khá lớn, hãy kiên nhẫn đọc lại lời giải thích và làm lại bài thi nhé! 💪";
+            
+            resultMessage.innerText = message;
+        }
+
+        // Init
+        loadQuestion();
+    </script>
+</body>
+</html>
